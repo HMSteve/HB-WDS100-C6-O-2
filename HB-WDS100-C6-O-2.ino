@@ -229,6 +229,7 @@ class Wds100EventMsg : public Message {
     }
 };
 
+
 class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_PER_CHANNEL, Wds100List0>, public Alarm {
     Sens_SHT31<0x44>    sht31;
     Sens_VEML6030<0x10> veml6030;
