@@ -8,26 +8,29 @@
 
 #include <Sensors.h>
 #include <Wire.h>
-#include <SparkFun_VEML6030_Ambient_Light_Sensor.h>
+#include "VEML6030.h"
 
-#define GAIN 2
-#define INTEGTIME 400
+#define POWERSAVEMODE 4
+#define GAIN 1
+#define INTEGTIME 200
+//scaling factors to map illuminance to 8-bit-value on logarithmic scale
+#define RESOLUTION 0.0036 * 800.0 / INTEGTIME * 2.0 / GAIN *1000
+#define F1 (255.0 / log10(RESOLUTION  * 65536.0))
+#define F2 F1 * log10(RESOLUTION)
+#define F3 255.0 / (255.0 - F2)
+
+
 
 namespace as {
 
 
 template <uint8_t ADDRESS=0x48>
 class Sens_VEML6030 : public Sensor {
-  SparkFun_Ambient_Light _veml6030;
-  uint32_t   _illuminance;
-
+  VEML6030 _veml6030;
+  uint32_t _illuminance;
 
 public:
-  Sens_VEML6030 ()
-  : _veml6030(ADDRESS)
-  , _illuminance(0)
-{
-}
+  Sens_VEML6030 () : _veml6030(ADDRESS) , _illuminance(0) {}
 
   void init () {
     Wire.begin();
@@ -35,7 +38,7 @@ public:
     DPRINT(F("VEML6030 "));
     if (_present) {
       DPRINTLN(F("OK"));
-      _veml6030.setPowSavMode(4);
+      _veml6030.setPowSavMode(POWERSAVEMODE);
       _veml6030.enablePowSave();
       _veml6030.setGain(GAIN);
       _veml6030.setIntegTime(INTEGTIME);
@@ -49,12 +52,11 @@ public:
   }
 
 
-  bool measure (__attribute__((unused)) bool async=false) {
+  bool measure () {
     if( present() == true ) {
       //_veml6030.powerOn();
       //delay(150);
-      _illuminance = _veml6030.readLight();
-      DPRINT("VEML6030 Illumination (Lux)   : "); DDECLN(_illuminance);
+      _illuminance = _veml6030.readMilliLux();
       //_veml6030.shutDown();
       return true;
     }
@@ -62,9 +64,16 @@ public:
   }
 
 
+  uint32_t milliLux() {
+    return _illuminance;
+  }
 
+  uint8_t brightness() {
+    int32_t brightness = round((log10((float)_illuminance + 1) * F1 - F2) * F3); //reading + 1 mLux to avoid log(0)
+    brightness = min(max(brightness,0),255);
+    return brightness;
+  }
 
-  int32_t illuminance() { return _illuminance; }
 };
 
 }

@@ -34,15 +34,12 @@
 #define AS5600PWRSW_PIN     28 
 #define RAINDETECTOR_PIN    18 
 #define RAINCOUNTER_PIN     19  
-#define WINDSPEED_PIN       20 
-  
 
 #define BAT_VOLT_LOW                32    //3.2V for 3x Alkaline with 3V3 LDO
 #define BAT_VOLT_CRITICAL           30  
 #define PEERS_PER_CHANNEL            2
-#define UPDATE_INTERVAL             10    //seconds. message transmission interval
+#define UPDATE_INTERVAL             15    //seconds. message transmission interval
 #define HIGHFREQ_MEASURE_INTERVAL    5    //seconds. measurement interval wind speed and brightness
-#define BRIGHTNESS_EMPIRIC_MAX    1000    //max value inside enclosure, to be determined
 #define ANEMOMETER_CALIB_FACTOR      1.0  //kmph per 10 anemometer turns (0.1Hz)
 
 //#define CLOCK_SYSCLOCK
@@ -80,7 +77,6 @@ volatile uint32_t _raincounter_isr_counter = 0;
 void raindetectorISR() {
   _raindetector_isr_indicator++;
   //save power by avoiding multiple interrupts during one measuring cycle, reenable in clock trigger function
-  //pinMode(RAINDETECTOR_PIN, INPUT);  
   if (digitalPinToInterrupt(RAINDETECTOR_PIN) == NOT_AN_INTERRUPT) disableInterrupt(RAINDETECTOR_PIN); else detachInterrupt(digitalPinToInterrupt(RAINDETECTOR_PIN));  
 }
 
@@ -273,7 +269,7 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
           } 
           chan.ws_measure_count++;   
           chan.veml6030.measure();
-          chan.brightness = chan.veml6030.illuminance() * 255 / BRIGHTNESS_EMPIRIC_MAX;  
+          chan.brightness = chan.veml6030.brightness();  
           if (chan.brightness >= chan.getList1().sunshineThreshold()) {
             if (ssh_total < 255 * 60 - HIGHFREQ_MEASURE_INTERVAL) {
               ssh_total += HIGHFREQ_MEASURE_INTERVAL;
@@ -283,10 +279,11 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
             }
           }
           // guess it's night when dark, so reset sunshine duration counter
-          if (chan.veml6030.illuminance() < 1) {
+          if (chan.veml6030.brightness() < 1) {
             ssh_total = 0;
           }
           chan.sunshineduration = ssh_total / 60;
+          DPRINT("mLux / 8-bit brightness = ");DDEC(chan.veml6030.milliLux()); DPRINT(" / "); DDECLN(chan.veml6030.brightness());
           //DPRINTLN("starting new high freq measurement cycle");        
           chan.pcf8593.resetCounter();
           tick = (seconds2ticks(HIGHFREQ_MEASURE_INTERVAL));
@@ -442,27 +439,20 @@ Wds100ConfigButton<Wds100Device> cfgBtn(sdev);
 
 
 void setup () {
-  //for old PCB version only
-  pinMode(WINDSPEED_PIN, INPUT);
   //switch on MOSFET to power CC1101
-  pinMode(CC1101_PWR_SW_PIN, OUTPUT);
+  pinMode(CC1101_PWR_SW_PIN, OUTPUT); 
   digitalWrite (CC1101_PWR_SW_PIN, LOW);
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
   sdev.init(hal);
-  
-  //CC1101 oscillator frequ 25.999010 MHz
-  hal.radio.initReg(CC1101_FREQ2, 0x21);
-  hal.radio.initReg(CC1101_FREQ1, 0x65);
-  hal.radio.initReg(CC1101_FREQ0, 0xBD);
-  
+   
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
   //sdev.getList0().dump();
   //sdev.channel(0).getList1().dump();
   
   pinMode(RAINDETECTOR_PIN, INPUT); //large ext pullup to save power during rain
-  pinMode(RAINCOUNTER_PIN, INPUT_PULLUP);  
-  if ( digitalPinToInterrupt(RAINCOUNTER_PIN) == NOT_AN_INTERRUPT ) enableInterrupt(RAINCOUNTER_PIN, raincounterISR, RISING); else attachInterrupt(digitalPinToInterrupt(RAINCOUNTER_PIN), raincounterISR, RISING);  
+  pinMode(RAINCOUNTER_PIN, INPUT);  
+  if ( digitalPinToInterrupt(RAINCOUNTER_PIN) == NOT_AN_INTERRUPT ) enableInterrupt(RAINCOUNTER_PIN, raincounterISR, CHANGE); else attachInterrupt(digitalPinToInterrupt(RAINCOUNTER_PIN), raincounterISR, CHANGE);  
 }
 
 

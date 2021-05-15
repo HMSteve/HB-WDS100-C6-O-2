@@ -25,6 +25,7 @@ namespace as {
           device.led().ledOn(200,0);
         }
         else {
+          DPRINTLN("start pairing...");
           device.startPairing();        
         }
       }
