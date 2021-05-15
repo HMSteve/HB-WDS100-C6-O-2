@@ -12,7 +12,7 @@
 
 #define POWERSAVEMODE 4
 #define GAIN 1
-#define INTEGTIME 200
+#define INTEGTIME 400
 //scaling factors to map illuminance to 8-bit-value on logarithmic scale
 #define RESOLUTION 0.0036 * 800.0 / INTEGTIME * 2.0 / GAIN *1000
 #define F1 (255.0 / log10(RESOLUTION  * 65536.0))

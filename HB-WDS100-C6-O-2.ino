@@ -314,7 +314,7 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
         device().sendPeerEvent(msg, *this);
       }
       wind_speed_gust = 0;
-      set(seconds2ticks(UPDATE_INTERVAL));
+      set(seconds2ticks(UPDATE_INTERVAL * (this->device().getList0().cycleInfoMsgDis() + 1)));
       clock.add(*this);
     }
 
