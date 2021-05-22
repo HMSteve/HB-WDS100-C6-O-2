@@ -38,9 +38,9 @@
 #define BAT_VOLT_LOW                32    //3.2V for 3x Alkaline with 3V3 LDO
 #define BAT_VOLT_CRITICAL           30  
 #define PEERS_PER_CHANNEL            2
-#define UPDATE_INTERVAL             15    //seconds. message transmission interval
+#define UPDATE_INTERVAL             10    //seconds. message transmission interval
 #define HIGHFREQ_MEASURE_INTERVAL    5    //seconds. measurement interval wind speed and brightness
-#define ANEMOMETER_CALIB_FACTOR      1.0  //kmph per 10 anemometer turns (0.1Hz)
+#define ANEMOMETER_CALIB_FACTOR     28    //empirical calib value ag. Windboss anemometer
 
 //#define CLOCK_SYSCLOCK
 #define CLOCK_RTC
@@ -262,8 +262,8 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
 
         void trigger (__attribute__ ((unused)) AlarmClock& clock)  {
           uint16_t ws = chan.pcf8593.getCount();
-          chan.ws_total += ws * 10;
-          ws = uint16_t(ANEMOMETER_CALIB_FACTOR * ws *10 / HIGHFREQ_MEASURE_INTERVAL);          
+          chan.ws_total += ws;
+          ws = uint16_t(ANEMOMETER_CALIB_FACTOR * ws / HIGHFREQ_MEASURE_INTERVAL);          
           if (ws > chan.wind_speed_gust) {
             chan.wind_speed_gust = ws;
           } 
@@ -284,6 +284,8 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
           }
           chan.sunshineduration = ssh_total / 60;
           DPRINT("mLux / 8-bit brightness = ");DDEC(chan.veml6030.milliLux()); DPRINT(" / "); DDECLN(chan.veml6030.brightness());
+          DPRINT("windspeed 1/10s         = ");DDECLN(ws);
+
           //DPRINTLN("starting new high freq measurement cycle");        
           chan.pcf8593.resetCounter();
           tick = (seconds2ticks(HIGHFREQ_MEASURE_INTERVAL));
