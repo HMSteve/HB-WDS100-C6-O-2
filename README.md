@@ -2,7 +2,7 @@
 
 ![HB-WDS100-C6-O-2](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_encl.jpg)
 
-Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsmesserplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
+Ein "Reparaturset" fuer den Wetter-Kombisensor HM-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik des Geraetes jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsmesserplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
 
 
 
@@ -11,11 +11,11 @@ Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der As
 Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden Geraeteteils muss vorsichtig in folgenden Schritten erfolgen, um Schaeden an den Plastikteilen zu vermeiden:
 1. Gehaeusehuelse ueber dem Batteriefach oeffnen und Batterien entfernen, Westernstecker loesen.
 2. Beide Schrauben, die den Rotor mit den drei Schalen auf der Welle halten, leicht loesen und Rotor abziehen.
-3. Zwei unter der Rotorkappe sichtbarwerdende virkantige Arretierungsstifte aus Platik vorsichtig nach oben herausziehen (etwas mit dem Schraubenzieher hebeln, dann mit der Zange greifen und senkrecht herausziehen)
-4. Die drei Ringe zu Sonnen- und Wetterschutz (Stevenson-Screen) mit dem oberen beginnend leicht im Urzeigersinn drehen, dass sich der jeweilige Bajonettverschluss loest, und Ring senkrecht nach oben abziehen.
+3. Zwei unter der Rotorkappe sichtbarwerdende vierkantige Arretierungsstifte aus Platik vorsichtig nach oben herausziehen (etwas mit dem Schraubenzieher hebeln, dann mit der Zange greifen und senkrecht herausziehen)
+4. Die drei Ringe zum Sonnen- und Wetterschutz (Stevenson-Screen) mit dem oberen beginnend leicht im Urzeigersinn drehen, dass sich der jeweilige Bajonettverschluss loest, und Ring senkrecht nach oben abziehen.
 5. Zwei kleine Schrauben ganz oben am Lager der Welle sowie danach fuenf lange Gehaeuseschrauben entfernen.
-6. Zwei Schrauben, die den Aufbau auf dem Edelstahlrohr fixieren, loesen und Aufbau senkrecht nach oben einige cm aus dem Rohr abziehen
-7. Die beiden Gehaeusehalbschalen lassen sich nun trennen und die defekte Platine ausbauen.
+6. Zwei Schrauben, die den Aufbau auf dem Edelstahlrohr fixieren, loesen und Aufbau senkrecht nach oben aus dem Rohr Heraus ziehen
+7. Die beiden Gehaeusehalbschalen lassen sich nun trennen und die defekte Platine ausbauen. Die Kabel koennen in der anderen Gehaeusehalbschale verbleiben.
 
 Die Demontage der Windrichtungsmesserplatine ist unproblematisch.
 
@@ -23,7 +23,7 @@ Als Ersatz sind zwei neue Platinen herzustellen: [Schalt- und Bestueckungsplaene
 
 ### Hauptplatine
 
-Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem [VEML6030](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/VEML6030.pdf). Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird hierfuer ein [PCF8593](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/PCF8593.pdf) eingesetzt.
+Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem [VEML6030](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/VEML6030.pdf). Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird zum Zaehlen ein [PCF8593](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/PCF8593.pdf) eingesetzt.
 
 Ein paar Fotos vom Aufbau:
 
@@ -31,12 +31,12 @@ Ein paar Fotos vom Aufbau:
 
 ![PCB Bottom](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_bot.jpg)
 
-Bei Nutzung der aktuellen Platine v2 sind zwei Fehler zu korrigieren. Dazu ist jeweils etwas Loetstoplack zu entfernen, um die geaenderten Bauteilpostionen bestuecken zu koennen.
+Bei Bestueckung der als Layout und Gerberfiles vorliegenden Platine v2.0 sind zwei Fehler zu korrigieren. Dazu ist jeweils etwas Loetstoplack zu entfernen, um die geaenderten Bauteilpostionen bestuecken zu koennen.
 
 ![PCB Bottom Changes](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_bot_pcbchanges.jpg)
 
-1. C17 ist nicht direkt am CC1101-Modul zu bestuecken, sondern direkt vor dem FET zur Abschaltung der Betriebsspannung bzw der vorhandenen Durchkontaktierung gegen die Masseflaeche. Ohne diese Aenderung koennen die Einschaltstromspitzen zu einem Brownout des ATMega fuehren und die Schaltung laeuft nicht oder geraet in eine Reset-Schleife.
-2. Der markierte 3.3M-Pullup-Widerstand gegen 3.3V fehlt im Layout und ist wie gezeigt zu ergaenzen.
+1. C17 ist nicht direkt am CC1101-Modul zu bestuecken, sondern direkt vor dem FET zur Abschaltung der Betriebsspannung bzw. an der dort vorhandenen Durchkontaktierung gegen die Masseflaeche. Ohne diese Aenderung koennen die Einschaltstromspitzen zu einem Brownout des ATMega fuehren und die Schaltung laeuft nicht oder geraet in eine Reset-Schleife.
+2. Der markierte 3.3M-Pullup-Widerstand gegen 3.3V fehlt im Layout und ist wie gezeigt zu ergaenzen. Auf Grund der Konstruktion der Regenzaehlerwippe, deren Reedkontakt in einer stabilen Wippenstellung stets geschlossen ist, scheidet die Nutzung des niederohmigen internen pull-up des ATMega wegen des Energieverbrauchs aus.
 
 Der korrigierte [Schaltplan v2.1](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/PCB/HB-WDS100-C6-O-2_Main_v2p1Schematic.pdf) (ohne Platinenlayout-Aenderung) zeigt die korrekte Schaltung.
 
