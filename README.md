@@ -21,7 +21,7 @@ Als Ersatz sind zwei neue Platinen herzustellen: [Schalt- und Bestueckungsplaene
 
 ### Hauptplatine
 
-Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem VEML6030. Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird hierfuer ein PCF8593 eingesetzt.
+Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem [VEML6030](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/VEML6030.pdf). Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird hierfuer ein [PCF8593](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/PCF8593.pdf) eingesetzt.
 
 Ein paar Fotos vom Aufbau:
 
@@ -36,6 +36,8 @@ Bei Nutzung der aktuellen Platine v2 sind zwei Fehler zu korrigieren. Dazu ist j
 1. C17 ist nicht direkt am CC1101-Modul zu bestuecken, sondern direkt vor dem FET zur Abschaltung der Betriebsspannung bzw der vorhandenen Durchkontaktierung gegen die Masseflaeche. Ohne diese Aenderung koennen die Einschaltstromspitzen zu einem Brownout des ATMega fuehren und die Schaltung laeuft nicht oder geraet in eine Reset-Schleife.
 2. Der markierte 3.3M-Pullup-Widerstand gegen 3.3V fehlt im Layout und ist wie gezeigt zu ergaenzen.
 
+Der korrigierte [Schaltplan v2.1](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/PCB/HB-WDS100-C6-O-2_Main_v2p1Schematic.pdf) (ohne Platinenlayout-Aenderung) zeigt die korrekte Schaltung.
+
 Zunaechst sind alle Bauteile ausser dem SHT31 zu bestuecken und die Platine bspw. mit Isopropanol von Flussmittelresten zu reinigen. Ganz zum Schluss wird der SHT31 bestueckt und die Schutzkappe aufgesetzt. Der Sensor darf Loesungsmitteln nicht ausgesetzt werden.
 
 Der besonders der Witterung ausgesetzte schmale (obere) Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu erhoehen. Auch hierbei ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw. durch Aufpinseln statt Spruehen von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten warmen Raum.
@@ -47,7 +49,7 @@ Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der sch
 
 ### Windrichtungsmesserplatine
 
-Auch wenn die Original-Windrichtungsmesserplatine kaum korrosionsanfaellig montiert und vermutlich nicht defekt ist, wurde zur einfacheren Einbindung in die gewaehlte AVR-Erchitektur auch diese neu erstellt. Genutzt wird ein AS5600 Halleffekt-Drehwinkelsensor, der ueber einen FET auf der Hauptplatine zwischen den Messungen zur Verringerung des Stromverbrauchs abgeschaltet wird.
+Auch wenn die Original-Windrichtungsmesserplatine kaum korrosionsanfaellig montiert und vermutlich nicht defekt ist, wurde zur einfacheren Einbindung in die gewaehlte AVR-Erchitektur auch diese neu erstellt. Genutzt wird ein [AS5600](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/AS5600.pdf) Halleffekt-Drehwinkelsensor, der ueber einen FET auf der Hauptplatine zwischen den Messungen zur Verringerung des Stromverbrauchs abgeschaltet wird.
 
 Der Aufbau erfolgt ohne Besonderheiten.
 
@@ -78,36 +80,23 @@ Um die [Firmware](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/Firmware
 Anschliessend sollte die Firmware problemlos kompilierbar und das Device nach dem Flashen anlernbar sein.
 
 
+
 ## Bedienung
 
-Es gibt neben der AskSinPP-Config-Taste eine weitere Bedientaste. Ein kurzer Druck auf diese schaltet die Ampel-LED ein bzw. aus, ein langer Druck fuehrt zu einer forced calibration des SCD30. Hierzu sollte sich der Sensor bereits einige Minuten an der frischen Luft ohne nennenswerte Druckschwankungen durch Wind befunden haben. Der lange Tastendruck kalibriert dann den Sensor auf den im WebUI hinterlegten CO2-Referenzwert (im Freien ca. 410ppm). Die automatische Kalibrierung wird nicht verwendet auf Basis der These, dass ein Wegdriften der Auto-Kalibrierung bei nicht ausreichendem regelmaessigem Lueften problematischer ist als die Alterungsdrift nach forced calibration. Langzeitbeobachtungen hierzu fehlen mir jedoch.
+Die Bedienung erfolgt grundsaetzlich analog dem originalen HM-WDS100-C6-O-2. Lediglich der Live Mode ist nicht implementiert.
+Die Geraetetaste weist folgende Funktionen auf:
+- kurzer Druck: Anlernmodus starten / Konfiguration uebernehmen
+- langer Druck: Einnordungsmodus starten
+- sehr langer Druck: Zuruecksetzen auf Werkseinstellung
 
-Unterschreitet die Akkuspannung 2.2V, wird ein Warnsymbol im Display angezeigt und ein USB-Ladegerate sollte angeschlossen werden. Geschieht das nicht und die Spannung sinkt unter 2.0V, schaltet sich der Sensor zum Schutz vor Tiefentladung ab und zeigt dies an. Ein Reset (Wiedereinschalten) erfolgt automatisch beim Anschluss eines Ladegeraetes. Die gruene LED zeigt das Anliegen der Ladespannung, die gelbe den Schnelladevorgang. Es ist zu beachten, dass die Erwaermung beim Schnelladen natuerlich die Messwerte im Gehaeuse verfaelscht.
+### Einnorden
 
-Die Schaltschwellen der Ampelfarben, die Hoehe ueber NN sowie ein vom SCD30-Temperaturmesswert zu subtrahierender Offset zur Korrektur der Anzeige koennen im WebUI konfiguriert werden.
-
-![WebUI Settings](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/webui_settings.jpg)
-
-Die Messwerte werden dann so angezeigt:
-
-![WebUI Status](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/webui_status.jpg)
+Bei Erstinstallation nach Montage ist der Einnordungsmodus durch langen Druck der Geraetetaste zu starten, die Windfahne Richtung Norden auszurichten und so festzuhalten und sodann die Geraetetaste kurz zu druecken. Das Abspeichern des absoluten Winkels der Nordrichtung im EEPROM wird durch Aufleuchten der gruenen LED bestaetigt. Erfolgt dies nicht, ist der Vorgang zu wiederholen.
 
 ### Hinweise zum Energieverbrauch
 
-Der SCD30 zieht einen nennenswerten Ruhestrom (mind. 5mA). Ein Power Cycling wird vom Hersteller nicht empfohlen, siehe [hier](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Addl/CD_AN_SCD30_Low_Power_Mode_D2.pdf).
-Damit ist fuer das Geraet bei der Voreinstellung einer Sensor-Abtastperiode von 16s eine Akkulaufzeit von hoechstens 5 Tagen zu erwarten. Das heisst, der mobile Betrieb waehrend eines oder einiger (Arbeits)tage ist problemslos moeglich. Der Dauerbetrieb sollte jedoch eher mit USB-Netzteil erfolgen. Dabei versorgt nach Ende der Schnelladung der von der MAX712-Ladeschaltung gelieferte, von R20 gemaess [Datenblatt MAX712](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Addl/MAX712-MAX713.pdf) feinjustierte Erhaltungsladestrom das Device.  
+Der Stromverbrauch des Sensors bei einem Sendeintervall von etwa 3 Minuten betraegt knapp 30uA, so dass eine Batterielaufzeit von einigen Jahren erreichbar sein sollte.  
 
-Hier eine Messung zum Stromverbrauch:
-
-![Power Consumption Detail](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/power_consumption_detail.jpg)
-
-Ein Excel-Workbook zum power budgeting findet sich [hier](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Addl/BatteryBudgeting.xlsx).
-
-
-## Gehaeuse
-
-Zwischen Display und Platine sind vier zu druckende Abstandshuelsen einzusetzen. Das Gehaeuse stellt beim Drucken keine groesseren Herausforderungen. Die LED-Loecher sind ggf. mit 10.5mm bzw. 3.5mm aufzubohren, die Loecher im Boden mit 3mm.
-Fuer die Befestigung der Platine sind [M3-Einpressmuttern](https://www.amazon.de/dp/B08BCRZZS3) vorgesehen. Die Befestigung der Platine im Gehaeuse erfolgt mit M3x10 Distanzbolzen. Die Rueckwand wird dann mit M3x10 Zylinderkopfschrauben an diesen befestigt.
 
 
 ## Disclaimer
