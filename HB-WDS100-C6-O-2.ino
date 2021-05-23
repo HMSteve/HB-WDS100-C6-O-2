@@ -6,7 +6,7 @@
 // 2021-01-26 HB drop-in replacement for HM-WDS100-C6-O-2, HMSteve (Creative Commons by-nc-sa)
 //- -----------------------------------------------------------------------------------------------------------------------
 
-//#define NDEBUG   // disable all serial debug messages 
+#define NDEBUG   // disable all serial debug messages 
 
 #define EI_NOTEXTERNAL
 
@@ -37,8 +37,8 @@
 
 #define BAT_VOLT_LOW                32    //3.2V for 3x Alkaline with 3V3 LDO
 #define BAT_VOLT_CRITICAL           30  
-#define PEERS_PER_CHANNEL            2
-#define UPDATE_INTERVAL             10    //seconds. message transmission interval
+#define PEERS_PER_CHANNEL            6
+#define UPDATE_INTERVAL            183    //seconds. message transmission interval
 #define HIGHFREQ_MEASURE_INTERVAL    5    //seconds. measurement interval wind speed and brightness
 #define ANEMOMETER_CALIB_FACTOR     28    //empirical calib value ag. Windboss anemometer
 
@@ -113,7 +113,7 @@ class Hal : public BaseHal {
       rtc.init();    // init real time clock - 1 tick per second
 #endif
       // measure battery every a*b*c seconds
-      battery.init(seconds2ticks(60UL * 60 * 6), CLOCK);  // 60UL * 60 for 1hour
+      battery.init(seconds2ticks(60UL * 60 * 12), CLOCK);  // 60UL * 60 for 1hour
       battery.low(BAT_VOLT_LOW);
       battery.critical(BAT_VOLT_CRITICAL);
     }
@@ -284,9 +284,7 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
           }
           chan.sunshineduration = ssh_total / 60;
           DPRINT("mLux / 8-bit brightness = ");DDEC(chan.veml6030.milliLux()); DPRINT(" / "); DDECLN(chan.veml6030.brightness());
-          DPRINT("windspeed 1/10s         = ");DDECLN(ws);
-
-          //DPRINTLN("starting new high freq measurement cycle");        
+          DPRINT("current windspeed km/h  = ");DDECLN(ws);
           chan.pcf8593.resetCounter();
           tick = (seconds2ticks(HIGHFREQ_MEASURE_INTERVAL));
           clock.add(*this);
@@ -302,9 +300,9 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
       measure_windspeed();   
       measure_raining();   
       rain_counter = _raincounter_isr_counter;
-      DPRINT("wind dir angle / corrected wind dir = ");DDEC(as5600.angle()); DPRINT(" / "); DDECLN(wind_direction * 5);
-      DPRINT("windspeed avg / gust / reported = ");DDEC(wind_speed_avg); DPRINT(" / ");DDEC(wind_speed_gust); DPRINT(" / ");DDECLN(wind_speed);
-      DPRINT("raining = ");DDECLN(raining);
+      DPRINT("wind dir angle / corrected wind dir  = ");DDEC(as5600.angle()); DPRINT(" / "); DDECLN(wind_direction * 5);
+      DPRINT("windspeed avg / gust / reported km/h = ");DDEC(wind_speed_avg); DPRINT(" / ");DDEC(wind_speed_gust); DPRINT(" / ");DDECLN(wind_speed);
+      DPRINT("raining =                              ");DDECLN(raining);
       Wds100EventMsg& msg = (Wds100EventMsg&)device().message();
       uint8_t msgcnt = device().nextcount();      
       msg.init( msgcnt, temperature, humidity, raining, rain_counter, wind_speed, wind_direction, wind_direction_range, sunshineduration, brightness, device().battery().low());
