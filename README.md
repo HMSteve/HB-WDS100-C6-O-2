@@ -1,12 +1,12 @@
 # HB-WDS100-C6-O-2
 
-![HB-WDS100-C6-O-2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/dev_front.jpg)
+![HB-WDS100-C6-O-2](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_encl.jpg)
 
-Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
+Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsmesserplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
 
 ## Hardware
 
-Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden Geraeteteils musst vorsichtig in folgenden Schritten erfolgen, um Schaeden an den Plastikteilen zu vermeiden:
+Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden Geraeteteils muss vorsichtig in folgenden Schritten erfolgen, um Schaeden an den Plastikteilen zu vermeiden:
 1. Gehaeusehuelse ueber dem Batteriefach oeffnen und Batterien entfernen, Westernstecker loesen.
 2. Beide Schrauben, die den Rotor mit den drei Schalen auf der Welle halten, leicht loesen und Rotor abziehen.
 3. Zwei unter der Rotorkappe sichtbarwerdende virkantige Arretierungsstifte aus Platik vorsichtig nach oben herausziehen (etwas mit dem Schraubenzieher hebeln, dann mit der Zange greifen und senkrecht herausziehen)
@@ -15,15 +15,13 @@ Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden
 6. Zwei Schrauben, die den Aufbau auf dem Edelstahlrohr fixieren, loesen und Aufbau senkrecht nach oben einige cm aus dem Rohr abziehen
 7. Die beiden Gehaeusehalbschalen lassen sich nun trennen und die defekte Platine ausbauen.
 
-Die Demontage der Winrrichtungsmesserplatine ist unproblematisch.
+Die Demontage der Windrichtungsmesserplatine ist unproblematisch.
 
 Als Ersatz sind zwei neue Platinen herzustellen: [Schalt- und Bestueckungsplaene sowie Gerberfiles](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/PCB).
 
 ### Hauptplatine
 
 Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem VEML6030. Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird hierfuer ein PCF8593 eingesetzt.
-
-[Schaltplan](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/PCB/HB-WDS100-C6-O-2_Main_v2p0Schematic.pdf)
 
 Ein paar Fotos vom Aufbau:
 
@@ -40,9 +38,9 @@ Bei Nutzung der aktuellen Platine v2 sind zwei Fehler zu korrigieren. Dazu ist j
 
 Zunaechst sind alle Bauteile ausser dem SHT31 zu bestuecken und die Platine bspw. mit Isopropanol von Flussmittelresten zu reinigen. Ganz zum Schluss wird der SHT31 bestueckt und die Schutzkappe aufgesetzt. Der Sensor darf Loesungsmitteln nicht ausgesetzt werden.
 
-Der etwas der Witterung ausgesetzte schmale Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu Erhoehen. Auch hier ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw. durch Aufpinseln von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten Raum.
+Der besonders der Witterung ausgesetzte schmale (obere) Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu erhoehen. Auch hierbei ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw. durch Aufpinseln statt Spruehen von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten warmen Raum.
 
-Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der schmale Platinenteil sowie der Antennendraht gefuehrt werden, beiseitig wie im Foto zu sehen mit neutral vernetzendem Silikon abgedichtet werden.
+Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der schmale Platinenteil sowie der Antennendraht gefuehrt werden, beidseitig wie im Foto zu sehen mit neutral vernetzendem Silikon abgedichtet werden.
 
 ![Einbau Main](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_encl.jpg)
 
@@ -68,7 +66,7 @@ Zur Verwendung des ATMega1284p ist bei Nutzung der Arduino IDE zunaechst eine zu
 
 Danach kann der Bootloader geflashed werden.
 
-Sollte versehentlich externer Tag eingestellt sein oder die entsprechenden Fuses anderweitig falsch gesetzt worden sein, kann auf der Platine ein 8MHz-Resonator CSTNE bestueckt werden, um den Controller zu retten. Fuer den Normalbetrieb ist der Resonator nicht notwendig.
+Sollte versehentlich externer Takt oder Quarzoszillator eingestellt oder die entsprechenden Fuses anderweitig falsch gesetzt worden sein, kann auf der Platine ein 8MHz-Resonator CSTNE von Murata bestueckt werden, um den Controller zu retten. Fuer den Normalbetrieb ist der Resonator nicht notwendig.
 
 Um die [Firmware](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/Firmware)  zu kompilieren, muessen sich die .ino sowie die .h Dateien im gleichen Verzeichnis befinden, das ./sensors-Verzeichnis darunter. Zudem muss eine Reihe von Bibliotheken ueber den Library Manager eingebunden werden:
 - AskSinPP
