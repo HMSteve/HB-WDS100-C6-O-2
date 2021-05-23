@@ -1,39 +1,65 @@
-# HB-UNI-Sen-CO2
+# HB-WDS100-C6-O-2
 
-![HB-UNI-Sen-CO2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/dev_front.jpg)
+![HB-WDS100-C6-O-2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/dev_front.jpg)
 
-Eine AskSinPP-Implementierung eines Innenraum-Sensors mit dem NDIR-CO2-Sensor SCD30. Das Geraet kann regulaer in eine Homematic-Umgebung eingebunden werden und liefert Messwerte fuer die CO2-Konzentration, Temperatur, Lueftfeuchte und bei bestuecktem BME280 auch Luftdruck. Ebenso kann es abseits einer Homematic-Installation stand-alone als "CO2-Ampel" verwendet werden: Die Messwerte werden auf einem E-Paper-Display angezeigt und es kann eine Indikator-LED fuer die CO2-Konzentration zugeschaltet werden. Der Betrieb erfolgt mittels zweier AA-NiMH-Akkus, auf Li-Po/Li-Ionen-Akkus wurde unter Sicherheitsaspekten bewusst verzichtet. Eine Ladeschaltung mit Micro-USB-Buchse ist eingebaut. Ueber diese erfolgt eine Schnelladung mit 500mA sowie auf Wunsch parallel zu einer "Erhaltungsladung" die dauerhafte Versorgung des Sensors. Hierzu dient ein uebliches USB-Ladegeraet, das mind. 1A dauerhaft liefern koennen sollte.
+Ein "Raparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
 
+## Hardware
 
-## Platine
+Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden Geraeteteils musst vorsichtig in folgenden Schritten erfolgen, um Schaeden an den Plastikteilen zu vermeiden:
+1. Gehaeusehuelse ueber dem Batteriefach oeffnen und Batterien entfernen, Westernstecker loesen.
+2. Beide Schrauben, die den Rotor mit den drei Schalen auf der Welle halten, leicht loesen und Rotor abziehen.
+3. Zwei unter der Rotorkappe sichtbarwerdende virkantige Arretierungsstifte aus Platik vorsichtig nach oben herausziehen (etwas mit dem Schraubenzieher hebeln, dann mit der Zange greifen und senkrecht herausziehen)
+4. Die drei Ringe zu Sonnen- und Wetterschutz (Stevenson-Screen) mit dem oberen beginnend leicht im Urzeigersinn drehen, dass sich der jeweilige Bajonettverschluss loest, und Ring senkrecht nach oben abziehen.
+5. Zwei kleine Schrauben ganz oben am Lager der Welle sowie danach fuenf lange Gehaeuseschrauben entfernen.
+6. Zwei Schrauben, die den Aufbau auf dem Edelstahlrohr fixieren, loesen und Aufbau senkrecht nach oben einige cm aus dem Rohr abziehen
+7. Die beiden Gehaeusehalbschalen lassen sich nun trennen und die defekte Platine ausbauen.
 
-Auf der Platine sind drei I2C-Steckplaetze fuer Sensoren vorgesehen. Neben dem [Sensirion SCD30](https://www.sensirion.com/de/umweltsensoren/kohlendioxidsensor/kohlendioxidsensoren-co2/) bietet sich ein [4-poliges BME280-Modul](https://www.ebay.de/itm/BME280-Temperatur-Luftdruck-Feuchtigkeit-Sensor-I2C-1-8-5V-Modul/114603492524) zur Luftdruck-Kompensation an. Der Drucksensor ist auch in der Firmware vorgesehen. Der dritte Steckplatz ist aktuell frei.
-Als Display findet ein [1.54" Waveshare-E-Paper-Modul](https://www.waveshare.com/1.54inch-e-Paper-Module.htm) Verwendung.
+Die Demontage der Winrrichtungsmesserplatine ist unproblematisch.
 
-[Schaltplan](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/PCB/HB-Uni-Sen-CO2_Schematic.pdf)
+Als Ersatz sind zwei neue Platinen herzustellen.
 
-[Stueckliste](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/PCB/HB_UNI_Sen_CO2_BOM.pdf)
+### Hauptplatine
+
+Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem VEML6030. Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird hierfuer ein PCF8593 eingesetzt.
+
+[Schaltplan](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/PCB/HB-WDS100-C6-O-2_Main_v2p0Schematic.pdf)
 
 Ein paar Fotos vom Aufbau:
 
-![PCB Top](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/pcb_top_1.jpg)
+![PCB Top](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_top.jpg)
 
-![PCB Bottom](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/pcb_bot_1.jpg)
+![PCB Bottom](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_bot.jpg)
 
-![PCB Top 2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/pcb_top_2.jpg)
+Bei Nutzung der aktuellen Platine v2 sind zwei Fehler zu korrigieren. Dazu ist jeweils etwas Loetstoplack zu entfernen, um die geaenderten Bauteilpostionen bestuecken zu koennen.
 
-![PCB Bottom 2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/pcb_bot_2.jpg)
+![PCB Bottom Changes](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_bot_pcbchanges.jpg)
 
-Hinweis: Da leider das Displaymodul und nicht der aktive Displaybereich mittig auf der Platine angeordnet wurden, ist die Duo-LED vor dem Gehaeuseeinbau durch Zurechtbiegen der Anschluesse ca. 3mm versetzt zu bestuecken. Die 3mm-LEDs duerfen den Platinenrand nur wenig ueberragen, um den Einbau ins Gehaeuse zu ermoeglichen.
+1. C17 ist nicht direkt am CC1101-Modul zu bestuecken, sondern direkt vor dem FET zur Abschaltung der Betriebsspannung bzw der vorhandenen Durchkontaktierung gegen die Masseflaeche. Ohne diese Aenderung koennen die Einschaltstromspitzen zu einem Brownout des ATMega fuehren und die Schaltung laeuft nicht oder geraet in eine Reset-Schleife.
+2. Der markierte 3.3M-Pullup-Widerstand gegen 3.3V fehlt im Layout und ist wie gezeigt zu ergaenzen.
+
+Zunaechst sind alle Bauteile ausser dem SHT31 zu bestuecken und die Platine bsbw. mit Isopropanol von Flussmittelresten zu reinigen. Ganz zum Schluss wird der SHT31 bestueckt und die Schutzkappe aufgesetzt. Der Sensor darf Loesungsmitteln nicht ausgesetzt werden.
+
+Der etwas der Witterung ausgesetzte schmale Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu Erhoehen. Auch hier ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw durch Aufpinseln von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten Raum.
+
+Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der schmale Platinenteil sowie der Antennendraht gefuehrt werden, mit neutral vernetzendem Silikon abgedichtet werden.
+
+![Einbau Main](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_encl.jpg)
 
 
-## Software
+### Windrichtungsmesserplatine
 
-### Addon zur Geraeteunterstuetzung
+Auch wenn die Original-Windrichtungsmesserplatine kaum korrosionsanfaellig montiert und vermutlich nicht defekt ist, wurde zur einfacheren Einbindung in die gewaehlte AVR-Erchitektur auch diese neu erstellt. Genutzt wird ein AS5600 Halleffekt-Drehwinkelsensor, der ueber einen FET auf der Hauptplatine zwischen den Messungen zur Verringerung des Stromverbrauchs abgeschaltet wird.
+Der Aufbau erfolgt ohne Besonderheiten.
 
-Sofern noch nicht vorhanden oder nicht aktuell, ist das [Addon](https://github.com/HMSteve/SG-HB-Devices-Addon/raw/master/CCU_RM/sg-hb-devices-addon.tgz) auf der CCU zu installieren. Der Sensor benoetigt mindestens Version 1.23.
+![PCB Top 2](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/winddir_top.jpg)
 
-### Firmware
+![PCB Bottom 2](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/winddir_bot.jpg)
+
+
+
+
+## Firmware
 
 Es wird ein ATMega1284p verwendet, da der Speicherplatz des ATMega328p nicht ausreicht. Deshalb ist bei Nutzung der Arduino IDE zunaechst eine zusaetzliche sog. Boardverwalter-URL (https://mcudude.github.io/MightyCore/package_MCUdude_MightyCore_index.json) in den Voreinstellungen zu hinterlegen. Folgende Boardeinstellungen sind dann auszuwaehlen:
 
