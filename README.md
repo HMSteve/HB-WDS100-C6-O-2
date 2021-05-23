@@ -4,6 +4,8 @@
 
 Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsmesserplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
 
+
+
 ## Hardware
 
 Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden Geraeteteils muss vorsichtig in folgenden Schritten erfolgen, um Schaeden an den Plastikteilen zu vermeiden:
