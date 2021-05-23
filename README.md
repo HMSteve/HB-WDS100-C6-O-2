@@ -2,7 +2,7 @@
 
 ![HB-WDS100-C6-O-2](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/dev_front.jpg)
 
-Ein "Raparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
+Ein "Reparaturset" fuer den Wetter-Kombisensor HB-WDS100-C6-O-2 auf Basis der AskSinPP-Bibliothek. Da Ausfaelle des originalen Wetter-Kombisensors wegen Korrosion der Hauptplatine offenbar nach einigen Jahren haeufiger vorkommen, die eigentliche Mechanik jedoch langlebig erscheint, wurde eine Ersatz-Elektronik sowie AskSinPP-basierte Firmware entwickelt, die es erlaubt, den Sensor ohne Modifikationen oder Addon-Installationen auf der CCU wieder zum Leben zu erwecken. Dazu sind sowohl die Hauptplatine als auch die Windrichtungsplatine gegen die neu konzipierten Platinen auszutauschen und der Sensor neu anzulernen.
 
 ## Hardware
 
@@ -17,7 +17,7 @@ Die Demontage des die Hauptplatine (und Batteriefach sowie Anemometer) tragenden
 
 Die Demontage der Winrrichtungsmesserplatine ist unproblematisch.
 
-Als Ersatz sind zwei neue Platinen herzustellen.
+Als Ersatz sind zwei neue Platinen herzustellen: [Schalt- und Bestueckungsplaene sowie Gerberfiles](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/PCB).
 
 ### Hauptplatine
 
@@ -38,11 +38,11 @@ Bei Nutzung der aktuellen Platine v2 sind zwei Fehler zu korrigieren. Dazu ist j
 1. C17 ist nicht direkt am CC1101-Modul zu bestuecken, sondern direkt vor dem FET zur Abschaltung der Betriebsspannung bzw der vorhandenen Durchkontaktierung gegen die Masseflaeche. Ohne diese Aenderung koennen die Einschaltstromspitzen zu einem Brownout des ATMega fuehren und die Schaltung laeuft nicht oder geraet in eine Reset-Schleife.
 2. Der markierte 3.3M-Pullup-Widerstand gegen 3.3V fehlt im Layout und ist wie gezeigt zu ergaenzen.
 
-Zunaechst sind alle Bauteile ausser dem SHT31 zu bestuecken und die Platine bsbw. mit Isopropanol von Flussmittelresten zu reinigen. Ganz zum Schluss wird der SHT31 bestueckt und die Schutzkappe aufgesetzt. Der Sensor darf Loesungsmitteln nicht ausgesetzt werden.
+Zunaechst sind alle Bauteile ausser dem SHT31 zu bestuecken und die Platine bspw. mit Isopropanol von Flussmittelresten zu reinigen. Ganz zum Schluss wird der SHT31 bestueckt und die Schutzkappe aufgesetzt. Der Sensor darf Loesungsmitteln nicht ausgesetzt werden.
 
-Der etwas der Witterung ausgesetzte schmale Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu Erhoehen. Auch hier ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw durch Aufpinseln von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten Raum.
+Der etwas der Witterung ausgesetzte schmale Teil der Platine sollte wenn moeglich dennoch mittels Schutzlack geschuetzt werden, um die Witterungsbestaendigkeit zu Erhoehen. Auch hier ist der SHT31 vor Loesungsmitteln zu schuetzen, bspw. durch Aufpinseln von [FSC](https://electrolube.com/product/fsc-flexible-silicone-conformal-coating/) auf die Platine, nicht jedoch auf die Schutzkappe des Sensors, und Trocknung in einem gut beluefteten Raum.
 
-Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der schmale Platinenteil sowie der Antennendraht gefuehrt werden, mit neutral vernetzendem Silikon abgedichtet werden.
+Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der schmale Platinenteil sowie der Antennendraht gefuehrt werden, beiseitig wie im Foto zu sehen mit neutral vernetzendem Silikon abgedichtet werden.
 
 ![Einbau Main](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/main_encl.jpg)
 
@@ -50,6 +50,7 @@ Beim Einbau der Platine in das Gehaeuse sollte die Aussparung, durch die der sch
 ### Windrichtungsmesserplatine
 
 Auch wenn die Original-Windrichtungsmesserplatine kaum korrosionsanfaellig montiert und vermutlich nicht defekt ist, wurde zur einfacheren Einbindung in die gewaehlte AVR-Erchitektur auch diese neu erstellt. Genutzt wird ein AS5600 Halleffekt-Drehwinkelsensor, der ueber einen FET auf der Hauptplatine zwischen den Messungen zur Verringerung des Stromverbrauchs abgeschaltet wird.
+
 Der Aufbau erfolgt ohne Besonderheiten.
 
 ![PCB Top 2](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/winddir_top.jpg)
@@ -61,20 +62,20 @@ Der Aufbau erfolgt ohne Besonderheiten.
 
 ## Firmware
 
-Es wird ein ATMega1284p verwendet, da der Speicherplatz des ATMega328p nicht ausreicht. Deshalb ist bei Nutzung der Arduino IDE zunaechst eine zusaetzliche sog. Boardverwalter-URL (https://mcudude.github.io/MightyCore/package_MCUdude_MightyCore_index.json) in den Voreinstellungen zu hinterlegen. Folgende Boardeinstellungen sind dann auszuwaehlen:
+Zur Verwendung des ATMega1284p ist bei Nutzung der Arduino IDE zunaechst eine zusaetzliche sog. Boardverwalter-URL (https://mcudude.github.io/MightyCore/package_MCUdude_MightyCore_index.json) in den Voreinstellungen zu hinterlegen. Folgende Boardeinstellungen sind dann auszuwaehlen:
 
-![Boardeinstellungen](https://github.com/HMSteve/HB-UNI-Sen-CO2/blob/main/Images/arduino_board_config.jpg)
+![Boardeinstellungen](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/images/arduino_board.jpg)
 
 Danach kann der Bootloader geflashed werden.
 
-Um die Firmware zu kompilieren, muessen sich die .ino sowie die .h Dateien im gleichen Verzeichnis befinden, das ./sensors-Verzeichnis darunter. Zudem muss eine Reihe von Bibliotheken ueber den Library Manager eingebunden werden:
+Sollte versehentlich externer Tag eingestellt sein oder die entsprechenden Fuses anderweitig falsch gesetzt worden sein, kann auf der Platine ein 8MHz-Resonator CSTNE bestueckt werden, um den Controller zu retten. Fuer den Normalbetrieb ist der Resonator nicht notwendig.
+
+Um die [Firmware](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/Firmware)  zu kompilieren, muessen sich die .ino sowie die .h Dateien im gleichen Verzeichnis befinden, das ./sensors-Verzeichnis darunter. Zudem muss eine Reihe von Bibliotheken ueber den Library Manager eingebunden werden:
 - AskSinPP
 - EnableInterrupt
 - LowPower
-- SparkFun SCD30 Arduino Library
-- Adafruit BME280 Library
-- GxEPD
-- Adafruit GFX
+- Adafruit_SHT31 Arduino Library
+- PCF8583 Library (Diese wird hier fuer den stromsparenderen PCF8593 genutzt.)
 
 Anschliessend sollte die Firmware problemlos kompilierbar und das Device nach dem Flashen anlernbar sein.
 
