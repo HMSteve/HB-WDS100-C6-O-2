@@ -96,9 +96,9 @@ Anschliessend sollte die Firmware problemlos kompilierbar und das Device nach de
 
 Die Bedienung erfolgt grundsaetzlich analog dem originalen HM-WDS100-C6-O-2. Lediglich der Live Mode ist nicht implementiert.
 Die Geraetetaste weist folgende Funktionen auf:
-- kurzer Druck: Anlernmodus starten / Konfiguration uebernehmen
-- langer Druck: Einnordungsmodus starten
-- sehr langer Druck: Zuruecksetzen auf Werkseinstellung
+- kurzer Druck: Anlernmodus starten / Konfiguration uebernehmen (LED langsam rot blinkend)
+- langer Druck: Einnordungsmodus starten (kurzes Blinkmuster der roten LED)
+- sehr langer Druck: Zuruecksetzen auf Werkseinstellung (einmaliges Aufleuchten der gruenen LED)
 
 ### Einnorden
 
@@ -108,7 +108,7 @@ Bei Erstinstallation nach Montage ist der Einnordungsmodus durch langen Druck de
 
 Um den geringen Dynamikumfang des Originalsensors etwas zu verbessern und insbesondere Helligkeiten in der Daemmerung sinnvoll auswerten zu koennen, wird die Beleuchtungsstaerke in Lux logarithmiert und auf den 8-Bit-Wertebereich skaliert ausgegeben. 100 kLux entsprechen etwa einem Wert von 220, 100 Lux noch immer etwa einem Wert von 80.
 
-Die Windgeschwindigkeit wurde mit Hausmitteln (Hand-Schalenanemometer und Laubblasgeraet) kalibriert, bei 35 Messungen ergab sich eine Regression mit Bestimmtheitsmass von 0.9. Im Gegensatz zum Originalsensor werden auch hoehere Windgeschwindigkeiten noch gemessen.
+Die Windgeschwindigkeit wurde mit Hausmitteln (Hand-Schalenanemometer und Laubblasgeraet) kalibriert, bei 35 Messungen ergab sich eine Regression mit Bestimmtheitsmass 0.9. Im Gegensatz zum Originalsensor werden auch hoehere Windgeschwindigkeiten noch gemessen.
 
 ### Hinweise zum Energieverbrauch
 
