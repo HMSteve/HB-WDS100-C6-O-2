@@ -92,9 +92,10 @@ Anschliessend sollte die Firmware problemlos kompilierbar und das Device nach de
 
 ## Bedienung
 
+Die Bedienung erfolgt grundsaetzlich analog dem originalen HM-WDS100-C6-O-2. Der Sensor kann an eine CCU angelernt werden. Direktverknuepfungen zum Steuerun von Aktoren abhaengig von der Windgeschwindigkeit sind moeglich. Lediglich der Live Mode ist nicht implementiert.
+
 ### Geraetetaste
 
-Die Bedienung erfolgt grundsaetzlich analog dem originalen HM-WDS100-C6-O-2. Lediglich der Live Mode ist nicht implementiert.
 Die Geraetetaste weist folgende Funktionen auf:
 - kurzer Druck: Anlernmodus starten / Konfiguration uebernehmen (LED langsam rot blinkend)
 - langer Druck: Einnordungsmodus starten (kurzes Blinkmuster der roten LED)

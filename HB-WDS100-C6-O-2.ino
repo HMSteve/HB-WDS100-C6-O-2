@@ -41,6 +41,7 @@
 #define UPDATE_INTERVAL            183    //seconds. message transmission interval
 #define HIGHFREQ_MEASURE_INTERVAL    5    //seconds. measurement interval wind speed and brightness
 #define ANEMOMETER_CALIB_FACTOR     28    //empirical calib value ag. Windboss anemometer
+#define NORTH_ANGLE_DEFAULT        140    //individual value if mounting direction is known, no need to change though
 
 //#define CLOCK_SYSCLOCK
 #define CLOCK_RTC
@@ -161,7 +162,7 @@ class Wds100List0 : public RegList0<Reg0> {
 };
 
 
-DEFREGISTER(Reg1, 0x05, 0x0A, 0x20, 0x21)
+DEFREGISTER(Reg1, 0x05, 0x06, 0x07, 0x0A, 0x20, 0x21)
 class Wds100List1 : public RegList1<Reg1> {
   public:
     Wds100List1 (uint16_t addr) : RegList1<Reg1>(addr) {}
@@ -173,7 +174,23 @@ class Wds100List1 : public RegList1<Reg1> {
     uint8_t sunshineThreshold () const {
       return this->readRegister(0x05, 0);
     } 
-
+    
+    bool stormUpperThreshold (uint8_t value) const {
+      return this->writeRegister(0x06, value & 0xff);
+    }
+    
+    uint8_t stormUpperThreshold () const {
+      return this->readRegister(0x06, 0);
+    }    
+    
+    bool stormLowerThreshold (uint8_t value) const {
+      return this->writeRegister(0x07, value & 0xff);
+    }
+    
+    uint8_t stormLowerThreshold () const {
+      return this->readRegister(0x07, 0);
+    }   
+    
     bool windSpeedResultSource (uint8_t value) const {
       return this->writeRegister(0x0A, value & 0xff);
     }
@@ -193,10 +210,12 @@ class Wds100List1 : public RegList1<Reg1> {
     void defaults () {
       clear();
       sunshineThreshold(0);
+      stormUpperThreshold(0);
+      stormLowerThreshold(0);
       windSpeedResultSource(0);
-      northAngle(345);
+      northAngle(NORTH_ANGLE_DEFAULT);
     }
-};    
+};     
 
 
 class Wds100EventMsg : public Message {
@@ -207,11 +226,7 @@ class Wds100EventMsg : public Message {
       if ( batlow == true ) {
         t1 |= 0x80; // set bat low bit
       }
-      // BIDI|WKMEUP every 20th msg
-      uint8_t flags = BCAST;
-      if ((msgcnt % 20) == 1) {
-          flags = BIDI | WKMEUP;
-      }      
+      uint8_t flags = 0;
       // Message Length (first byte param.): 11 + payload. Max. payload: 17 Bytes (https://www.youtube.com/watch?v=uAyzimU60jw)
       Message::init(19, msgcnt, 0x70, flags, t1, t2);
       pload[0] = humidity & 0xff;
@@ -231,23 +246,24 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
     Sens_VEML6030<0x10> veml6030;
     Sens_AS5600         as5600; 
     PCF8593             pcf8593;  
-    int16_t temperature = 0;
-    uint8_t humidity = 0;
-    uint8_t raining = 0;    
+    int16_t  temperature = 0;
+    uint8_t  humidity = 0;
+    uint8_t  raining = 0;    
     uint16_t rain_counter = 0; 
     uint16_t wind_speed = 0; 
-    uint8_t wind_direction = 0;  
-    uint8_t wind_direction_range = 0;  
-    uint8_t sunshineduration = 0;  
-    uint8_t brightness = 0;   
+    uint8_t  wind_direction = 0;  
+    uint8_t  wind_direction_range = 0;  
+    uint8_t  sunshineduration = 0;  
+    uint8_t  brightness = 0;   
     uint16_t ws_total = 0; 
     uint16_t ws_measure_count = 0;  
     uint16_t wind_speed_avg = 0; 
     uint16_t wind_speed_gust = 0;      
-      
+    uint16_t  stormUpperThreshold;
+    uint16_t  stormLowerThreshold;        
                            
   public:
-    Wds100Channel () : Channel(), Alarm(10), windspeed_measure(*this) {}
+    Wds100Channel () : Channel(), Alarm(10), hfMeasureAlarm(*this) {}
     
     virtual ~Wds100Channel () {}
 
@@ -261,13 +277,8 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
         virtual ~HighFreqMeasureAlarm () {}
 
         void trigger (__attribute__ ((unused)) AlarmClock& clock)  {
-          uint16_t ws = chan.pcf8593.getCount();
-          chan.ws_total += ws;
-          ws = uint16_t(ANEMOMETER_CALIB_FACTOR * ws / HIGHFREQ_MEASURE_INTERVAL);          
-          if (ws > chan.wind_speed_gust) {
-            chan.wind_speed_gust = ws;
-          } 
-          chan.ws_measure_count++;   
+          chan.measure_windspeed();
+
           chan.veml6030.measure();
           chan.brightness = chan.veml6030.brightness();  
           if (chan.brightness >= chan.getList1().sunshineThreshold()) {
@@ -284,12 +295,12 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
           }
           chan.sunshineduration = ssh_total / 60;
           DPRINT("mLux / 8-bit brightness = ");DDEC(chan.veml6030.milliLux()); DPRINT(" / "); DDECLN(chan.veml6030.brightness());
-          DPRINT("current windspeed km/h  = ");DDECLN(ws);
+
           chan.pcf8593.resetCounter();
           tick = (seconds2ticks(HIGHFREQ_MEASURE_INTERVAL));
           clock.add(*this);
         }
-    } windspeed_measure;
+    } hfMeasureAlarm;
 
 
     virtual void trigger (AlarmClock& clock) {
@@ -297,7 +308,7 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
       temperature = sht31.temperature();
       humidity = sht31.humidity();        
       measure_winddir();
-      measure_windspeed();   
+      evaluate_windspeed();   
       measure_raining();   
       rain_counter = _raincounter_isr_counter;
       DPRINT("wind dir angle / corrected wind dir  = ");DDEC(as5600.angle()); DPRINT(" / "); DDECLN(wind_direction * 5);
@@ -306,29 +317,55 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
       Wds100EventMsg& msg = (Wds100EventMsg&)device().message();
       uint8_t msgcnt = device().nextcount();      
       msg.init( msgcnt, temperature, humidity, raining, rain_counter, wind_speed, wind_direction, wind_direction_range, sunshineduration, brightness, device().battery().low());
-      if (msg.flags() & Message::BCAST) {
-        device().broadcastEvent(msg, *this);
+      // BIDI|WKMEUP every 20th msg      
+      if ((msgcnt % 20) == 1) {
+          DPRINTLN("sendMasterEvent");
+          msg.flags(Message::BIDI | Message::WKMEUP);
+          device().sendMasterEvent(msg);
+      } else {
+          DPRINTLN("broadcastEvent");
+          msg.flags(Message::BCAST);  
+          device().broadcastEvent(msg);
       }
-      else
-      {
-        device().sendPeerEvent(msg, *this);
-      }
+      
       wind_speed_gust = 0;
       set(seconds2ticks(UPDATE_INTERVAL * (this->device().getList0().cycleInfoMsgDis() + 1)));
       clock.add(*this);
     }
 
+    void measure_windspeed() {
+      uint16_t ws = pcf8593.getCount();
+      ws_total += ws;
+      ws = uint16_t(ANEMOMETER_CALIB_FACTOR * ws / HIGHFREQ_MEASURE_INTERVAL);     
+      if (ws > wind_speed_gust) {
+        wind_speed_gust = ws;
+      } 
+      ws_measure_count++;   
+      DPRINT("current windspeed km/h * 10 = ");DDECLN(ws);
 
-    void measure_raining(){
-      raining = _raindetector_isr_indicator;
-      if(digitalRead(RAINDETECTOR_PIN) == 1) {
-        _raindetector_isr_indicator = 0;
-        if ( digitalPinToInterrupt(RAINDETECTOR_PIN) == NOT_AN_INTERRUPT ) enableInterrupt(RAINDETECTOR_PIN, raindetectorISR, FALLING); else attachInterrupt(digitalPinToInterrupt(RAINDETECTOR_PIN), raindetectorISR, FALLING);  
-      }      
+      static uint8_t STORM_COND_VALUE_Last = 0;
+      static uint8_t STORM_COND_VALUE      = 0;
+
+      if (stormUpperThreshold > 0) {
+        if (ws >= stormUpperThreshold || ws <= stormLowerThreshold) {
+          static uint8_t evcnt = 0;
+          if (ws >= stormUpperThreshold) STORM_COND_VALUE = 1;
+          if (ws <= stormLowerThreshold) STORM_COND_VALUE = 0;          
+
+          if (STORM_COND_VALUE != STORM_COND_VALUE_Last) {
+            SensorEventMsg& rmsg = (SensorEventMsg&)device().message();
+            DPRINT(F("PEER THRESHOLD DETECTED : ")); DDECLN(STORM_COND_VALUE);
+            rmsg.init(device().nextcount(), number(), evcnt++, ws / 10, false , false);           
+            rmsg.flags(Message::BIDI | Message::WKMEUP);
+            device().sendPeerEvent(rmsg, *this);
+          }
+          STORM_COND_VALUE_Last = STORM_COND_VALUE;
+        }
+      }
     }
 
 
-    void measure_windspeed() {
+    void evaluate_windspeed() {
       wind_speed_avg = uint16_t(ANEMOMETER_CALIB_FACTOR * ws_total / HIGHFREQ_MEASURE_INTERVAL / ws_measure_count);
       if (this->getList1().windSpeedResultSource() == 1) {
         wind_speed = wind_speed_gust;
@@ -378,6 +415,15 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
       return as5600.angle();
     }
 
+
+    void measure_raining(){
+      raining = _raindetector_isr_indicator;
+      if(digitalRead(RAINDETECTOR_PIN) == 1) {
+        _raindetector_isr_indicator = 0;
+        if ( digitalPinToInterrupt(RAINDETECTOR_PIN) == NOT_AN_INTERRUPT ) enableInterrupt(RAINDETECTOR_PIN, raindetectorISR, FALLING); else attachInterrupt(digitalPinToInterrupt(RAINDETECTOR_PIN), raindetectorISR, FALLING);  
+      }      
+    }
+
     
     void setup(Device<Hal, Wds100List0>* dev, uint8_t number, uint16_t addr) {
       Channel::setup(dev, number, addr);
@@ -386,7 +432,7 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
       pcf8593.init();
       set(seconds2ticks(2));  // first message in 2 sec.      
       CLOCK.add(*this);
-      CLOCK.add(windspeed_measure);      
+      CLOCK.add(hfMeasureAlarm);      
     }
 
     uint8_t status () const {
@@ -399,8 +445,12 @@ class Wds100Channel : public Channel<Hal, Wds100List1, EmptyList, List4, PEERS_P
 
     void configChanged() {
       Channel::configChanged();
+      stormUpperThreshold = this->getList1().stormUpperThreshold() * 10;
+      stormLowerThreshold = this->getList1().stormLowerThreshold() * 10;      
       DPRINTLN("* Channel Conf Changed : Wds100List1");
       DPRINT(F("* Sonnescheinschwelle  : ")); DDECLN(this->getList1().sunshineThreshold()); 
+      DPRINT(F("* Sturm obere Schwelle : ")); DDECLN(this->getList1().stormUpperThreshold());  
+      DPRINT(F("* Sturm untere Schwelle: ")); DDECLN(this->getList1().stormLowerThreshold());       
       DPRINT(F("* Art Windgeschw.      : ")); DDECLN(this->getList1().windSpeedResultSource());
       DPRINT(F("* Winkel Nord          : ")); DDECLN(this->getList1().northAngle());      
     }
