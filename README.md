@@ -27,6 +27,8 @@ Als Ersatz sind zwei neue Platinen herzustellen: [Schalt- und Bestueckungsplaene
 
 Die Platinen sind bzgl. Bauteilbauformen, Padgroessen und Abstaenden grundsaetzlich fuer Handloetung vorgesehen, Details siehe unten.
 
+Fuer die etwas spezielleren Bauteile finden sich Bezugsquellen hier: [Bezugsquellen](https://github.com/HMSteve/HB-WDS100-C6-O-2/tree/main/PCB/SourcingSpecialParts.xlsx)
+
 ### Hauptplatine
 
 Die Platine basiert auf einem ATMega1284p. Die Temperatur-/Luftfeuchtemessung erfolgt mit einem SHT31, die Helligkeitsmessung mit einem [VEML6030](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/VEML6030.pdf). Die Windgeschwindigkeit wird wie im Original per Reedkontakt gezaehlt, zur Reduzierung des Stromverbrauchs wird zum Zaehlen ein [PCF8593](https://github.com/HMSteve/HB-WDS100-C6-O-2/blob/main/datasheets/PCF8593.pdf) eingesetzt.
